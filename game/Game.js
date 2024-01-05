@@ -98,6 +98,7 @@ export default class Game {
     }
 
     #controls(e) {
+        let keyPress = false;
         const heroOldPos = this.#hero.getPos();
 
         if (this.#end) {
@@ -107,7 +108,7 @@ export default class Game {
         if (this.#hero.getHealth() <= 0) {
             let loseDiv = document.createElement('div');
 
-            loseDiv.classList.add('lose');
+            loseDiv.classList.add('end');
 
             loseDiv.innerHTML = 'Game Over';
 
@@ -121,7 +122,7 @@ export default class Game {
         if (this.#enemies.length <= 0) {
             let winDiv = document.createElement('div');
 
-            winDiv.classList.add('lose');
+            winDiv.classList.add('end');
 
             winDiv.innerHTML = 'you Win!!! moves: ' + this.#move_number;
 
@@ -144,6 +145,7 @@ export default class Game {
                         x: heroOldPos.x,
                         y: heroOldPos.y - 1,
                     });
+                keyPress = true;
                 break;
             case 'KeyS':
                 if (
@@ -156,6 +158,8 @@ export default class Game {
                         x: heroOldPos.x,
                         y: heroOldPos.y + 1,
                     });
+                keyPress = true;
+
                 break;
             case 'KeyD':
                 if (
@@ -168,6 +172,8 @@ export default class Game {
                         x: heroOldPos.x + 1,
                         y: heroOldPos.y,
                     });
+                keyPress = true;
+
                 break;
             case 'KeyA':
                 if (
@@ -180,6 +186,7 @@ export default class Game {
                         x: heroOldPos.x - 1,
                         y: heroOldPos.y,
                     });
+                keyPress = true;
 
                 break;
             case 'Space':
@@ -220,34 +227,40 @@ export default class Game {
                     cells[heroOldPos.x + 1][heroOldPos.y].healthDown(
                         this.#hero.attack_power
                     );
+                keyPress = true;
 
                 break;
         }
+        if (keyPress) {
+            if (
+                this.#field.isSword({
+                    x: this.#hero.getPos().x,
+                    y: this.#hero.getPos().y,
+                }) ||
+                this.#field.isHealth({
+                    x: this.#hero.getPos().x,
+                    y: this.#hero.getPos().y,
+                })
+            ) {
+                this.#field.setTileToFloor({
+                    x: this.#hero.getPos().x,
+                    y: this.#hero.getPos().y,
+                });
+            }
 
-        if (
-            this.#field.isSword({
-                x: this.#hero.getPos().x,
-                y: this.#hero.getPos().y,
-            }) ||
-            this.#field.isHealth({
-                x: this.#hero.getPos().x,
-                y: this.#hero.getPos().y,
-            })
-        ) {
-            this.#field.setTileToFloor({
-                x: this.#hero.getPos().x,
-                y: this.#hero.getPos().y,
+            this.#field.swapTiles(heroOldPos, this.#hero.getPos());
+            this.#step();
+
+            this.#setCameraPosition({
+                x:
+                    this.#hero.getPos().x -
+                    (constants.GAME_WINDOW_WIDTH - 1) / 2,
+                y:
+                    this.#hero.getPos().y -
+                    (constants.GAME_WINDOW_HEIGHT - 1) / 2,
             });
+            this.#display();
         }
-
-        this.#field.swapTiles(heroOldPos, this.#hero.getPos());
-        this.#step();
-
-        this.#setCameraPosition({
-            x: this.#hero.getPos().x - (constants.GAME_WINDOW_WIDTH - 1) / 2,
-            y: this.#hero.getPos().y - (constants.GAME_WINDOW_HEIGHT - 1) / 2,
-        });
-        this.#display();
     }
 
     // pos: {x: number, y: number}
@@ -298,6 +311,7 @@ export default class Game {
         }
     }
 
+    // step of game
     #step() {
         this.#enemies.forEach((enemy, i, enemies) => {
             if (enemy.health <= 0) {

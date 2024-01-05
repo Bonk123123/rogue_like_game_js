@@ -16,7 +16,7 @@ export default class Field {
             this.cells.push(Array(params.height).fill(new WallTile()));
         }
 
-        // generate rooms
+        // generate rooms count
         this.room_count =
             Math.random() * (constants.MAX_ROOMS - constants.MIN_ROOMS) +
             constants.MIN_ROOMS;
@@ -118,6 +118,7 @@ export default class Field {
     }
 
     // quantity: number
+    // return {x: number, y: number}[]
     getSomePosOfRandomFreeSpace(quantity) {
         let all_pos_of_free_space = [];
 
@@ -142,6 +143,7 @@ export default class Field {
         return random_pos_free_spaces;
     }
 
+    // return {coords: {x: number, y: number}, room_width: number, room_height: number}
     generateRoom() {
         let tries_count = 0;
         let coord, room_width, room_height;
@@ -190,11 +192,10 @@ export default class Field {
                 }
             }
 
-            if (!loop || tries_count > 100) break;
+            if (!loop || tries_count > 100)
+                return { coord, room_width, room_height };
             tries_count++;
         }
-
-        return { coord, room_width, room_height };
     }
 
     // activeTile: all active tile types

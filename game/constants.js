@@ -5,7 +5,7 @@ const constants = {
     GAME_WINDOW_WIDTH: 21,
     GAME_WINDOW_HEIGHT: 13,
 
-    MIN_ROOMS: 5,
+    MIN_ROOMS: 3,
     MAX_ROOMS: 8,
     MIN_WIDTH_ROOM: 5,
     MIN_HEIGHT_ROOM: 5,
